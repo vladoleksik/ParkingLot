@@ -27,8 +27,10 @@
             <div class="invalid-feedback">Please select an owner.</div>
         </div>
 
+        <c:if test="${pageContext.request.isUserInRole('WRITE_CARS')}">
         <div class="col-12">
             <button class="btn btn-primary" type="submit">Save</button>
         </div>
+        </c:if>
     </form>
 </t:pageTemplate>

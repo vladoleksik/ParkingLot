@@ -29,8 +29,10 @@
 
         <input type="hidden" name="car_id" value="${car.id}"/>
 
+        <c:if test="${pageContext.request.isUserInRole('WRITE_CARS')}">
         <div class="col-12">
             <button class="btn btn-primary" type="submit">Save</button>
         </div>
+        </c:if>
     </form>
 </t:pageTemplate>
