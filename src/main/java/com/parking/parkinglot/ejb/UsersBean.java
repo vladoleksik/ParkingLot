@@ -37,6 +37,20 @@ public class UsersBean {
         }
     }
 
+    public UserDto findById(Long userId) {
+        LOG.info("findById");
+        try {
+            User user = entityManager.find(User.class, userId);
+            return new UserDto(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getUsername(),
+                    user.getPassword());
+        } catch (Exception e) {
+            throw new EJBException(e);
+        }
+    }
+
     public List<UserDto> copyCarsToDto(List<User> users) {
         return users.stream()
                 .map(user -> new UserDto(
@@ -73,5 +87,34 @@ public class UsersBean {
                         .setParameter("userIds", userIds)
                         .getResultList();
         return usernames;
+    }
+
+    public void updateUser(Long userId, String username, String email, String password, Collection<String> groups) {
+        LOG.info("updateCar");
+
+        User user = entityManager.find(User.class, userId);
+        user.setUsername(username);
+        user.setEmail(email);
+        if(password != null && !password.isEmpty()) {
+            user.setPassword(passwordBean.convertToSha256(password));
+        }
+
+        //Get old groups
+        List<UserGroup> oldGroups = entityManager.createQuery("SELECT ug FROM UserGroup ug WHERE ug.username = :username", UserGroup.class)
+                .setParameter("username", username)
+                .getResultList();
+
+        //Remove old groups if not in new groups
+        for (UserGroup oldGroup : oldGroups) {
+            if (!groups.contains(oldGroup.getUserGroup())) {
+                entityManager.remove(oldGroup);
+            }
+        }
+
+        //Remove oldGroups from groups
+        groups.removeIf(group -> oldGroups.stream().anyMatch(oldGroup -> oldGroup.getUserGroup().equals(group)));
+
+        //Assign new groups
+        assignGroupsToUser(username, groups);
     }
 }
