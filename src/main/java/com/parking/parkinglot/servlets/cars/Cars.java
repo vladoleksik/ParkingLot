@@ -26,7 +26,8 @@ public class Cars extends HttpServlet {
             response) throws ServletException, IOException {
         List<CarDto> cars = carsBean.findAllCars();
         request.setAttribute("cars", cars);
-        request.setAttribute("numberOfFreeParkingSpots", 10);
+        int freeSpots = carsBean.getFreeParkingSpots();
+        request.setAttribute("numberOfFreeParkingSpots", freeSpots);
         request.getRequestDispatcher("/WEB-INF/pages/cars/cars.jsp").forward(request,response);
     }
 
